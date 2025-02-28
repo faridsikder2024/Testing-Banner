@@ -128,17 +128,33 @@ function updateConsent() {
 
         gtag('consent', 'update', consent);
         pushDataLayer(consent, "page_view_consent");
-
     } else if (!getBannerChoice) {
         gtag('consent', 'update', consent);
         pushDataLayer(consent, "page_view_consent");
     }
 
-    localStorage.setItem("showBanner", true);
+    localStorage.setItem("showBanner", "true");
 }
 
-updateConsent();
+// 🛠️ FIX: Restoring processCookies function to ensure the banner displays
+function processCookies() {
+    updateConsent(); // Ensures consent values are set
+    checkChoiceShowBanner(); // Checks if the banner should be displayed
+}
 
+// 🛠️ FIX: Ensure banner shows correctly
+function checkChoiceShowBanner() {
+    var choiceMade = localStorage.getItem("choiceMade");
+    var showBanner = localStorage.getItem("showBanner");
+
+    if (showBanner === "true") {
+        if (!choiceMade) {
+            document.querySelector(".cookieBannerWrapper").style.display = "block";
+        }
+    }
+}
+
+// Store and retrieve query params for better tracking
 function storeQueryParams() {
     if (storeQuery) {
         var queryParams = {};
@@ -172,25 +188,7 @@ function addStoredParamsToURL() {
     }
 }
 
+// 🛠️ FIX: Ensure banner loads properly on page load
 window.addEventListener("load", function() {
-    var manualCookie = [];
-    var cookieCategories = {};
-    var checkedCategories = {
-        Necessary: "denied",
-        Preferences: "denied",
-        Statistics: "denied",
-        Marketing: "denied",
-        Unclassified: "denied",
-    }
-
-    async function fetchCookies() {
-        const response = await fetch('https://cdn.jsdelivr.net/gh/consentbyalifmahmud-com/Consent-Banners@7f0cf88062efb8fdd993eff5167c80f73dc72444/metricsrealm.com/cookie.json');
-        return response.json();
-    }
-
-    function processCookies() {
-        console.log("Processing cookies...");
-    }
-
     processCookies();
 });
